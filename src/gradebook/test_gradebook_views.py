@@ -84,6 +84,15 @@ class TestGradebookScreenView(unittest.TestCase):
         self.assertEqual(courses, self.current_user.courses)
         self.render_template.assert_called_with('studentGradebook.html', courses=courses, tasks=data)
 
+    def test_student_no_courses(self):
+        self.current_user.permissions = 10
+        courses = []
+        self.current_user.courses = courses
+        data = []
+
+        ret = views.GradebookScreenView().get()
+        self.render_template.assert_called_with('studentGradebook.html', courses=courses, tasks=data)
+
     def test_author(self):
         self.current_user.permissions = 20
         t = Mock()
