@@ -50,9 +50,8 @@ class TestGradebookScreenView(unittest.TestCase):
         data = []
         data.append(d)
 
-        ret = views.GradebookScreenView().get()
-        self.assertEqual(courses, self.current_user.courses)
-        self.render_template.assert_called_with('studentGradebook.html', courses=courses, tasks=data)
+        views.GradebookScreenView().get()
+        self.render_template.assert_called_with('studentGradebook.html', courses=self.current_user.courses, tasks=data)
 
     def test_student_archived_course_first(self):
         self.current_user.permissions = 10
@@ -66,7 +65,8 @@ class TestGradebookScreenView(unittest.TestCase):
         courses = [course2,course]
         self.current_user.courses = courses
         response = Mock()
-        self.models.TaskResponse.query.filter.return_value.order_by.return_value.first.return_value = response
+        self.models.TaskResponse.query.filter.return_value.order_by.\
+            return_value.first.return_value = response
         t = {
             'task': task,
             'response': response
@@ -80,9 +80,8 @@ class TestGradebookScreenView(unittest.TestCase):
         data = []
         data.append(d)
 
-        ret = views.GradebookScreenView().get()
-        self.assertEqual(courses, self.current_user.courses)
-        self.render_template.assert_called_with('studentGradebook.html', courses=courses, tasks=data)
+        views.GradebookScreenView().get()
+        self.render_template.assert_called_with('studentGradebook.html', courses=self.current_user.courses, tasks=data)
 
     def test_student_no_courses(self):
         self.current_user.permissions = 10
