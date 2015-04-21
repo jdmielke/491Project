@@ -88,11 +88,10 @@ class TestGradebookScreenView(unittest.TestCase):
         self.current_user.permissions = 20
         t = Mock()
         teaching = [t]
-        self.models.Course.query.filter_by.return_value.all.return_value = teaching
         c = Mock()
         courses_where_ta = [c]
-        self.current_user.get_courses_where_ta.return_value = courses_where_ta
         teaching += courses_where_ta
+        self.current_user.get_courses_where_teacher_or_ta.return_value = teaching
 
         ret = views.GradebookScreenView().get()
         self.render_template.assert_called_with('authorGradebook.html', courses=teaching)
