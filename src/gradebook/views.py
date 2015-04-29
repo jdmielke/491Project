@@ -17,7 +17,9 @@ class GradebookScreenView(MethodView):
     def get(self):
         if current_user.permissions == 10:
             data = []
-            for c in current_user.get_courses_enrolled():
+            for c in current_user.courses:
+                if c.isArchived:
+                    continue
                 tasks = []
                 d = {
                     'course': c,
@@ -35,7 +37,7 @@ class GradebookScreenView(MethodView):
                 d['tasks'] = tasks
                 data.append(d)
             return render_template('studentGradebook.html',
-                                   courses=current_user.get_courses_enrolled(),
+                                   courses=current_user.courses,
                                    tasks=data)
         elif current_user.permissions >= 20:
             courses = current_user.get_courses_where_teacher_or_ta()

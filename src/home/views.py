@@ -20,8 +20,10 @@ class HomeScreenView(MethodView):
 
     def get(self):
         teaching = current_user.get_courses_where_teacher_or_ta()
-        enrolled = current_user.get_courses_enrolled()
-
+        enrolled = []
+        for course in current_user.courses:
+            if not course.isArchived:
+                enrolled.append(course)
         return render_template('home.html',
                                courses_enrolled=enrolled,
                                courses_teaching=teaching)
@@ -30,7 +32,7 @@ class HomeScreenView(MethodView):
 class ClassListView(MethodView):
     def get(self):
         if current_user.is_authenticated():
-            courses = current_user.get_courses_enrolled()
+            courses = current_user.courses
             courses += current_user.get_courses_where_teacher_or_ta()
             courses = [c.serialize for c in courses]
             return flask.json.dumps(courses)
