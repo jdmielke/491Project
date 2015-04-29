@@ -24,22 +24,18 @@ class ResponseView(MethodView):
         course = task_response.task.course
         courses_where_ta = current_user.get_courses_where_ta()
         if task_response.student_id != current_user.id and \
-                course not in current_user.get_courses_where_teacher_or_ta():
+                course.teacher_id != current_user.id and \
+                course not in courses_where_ta:
             return "Permission Denied", 401
-        if task_response.student_id == current_user.id and \
-                task_response.task.status != "grades published":
-            return "Task Not Yet Released"
         formatted_time = task_response.datetime.strftime("%a %b %d %H:%M:%S")
         response = json.loads(task_response.graded_response)
         supplementary = json.loads(task_response.graded_supplementary)
-        supplementary_order = json.loads(task_response.supplementary_order)
 
         return render_template("grading/response.html", response=response,
                                student=task_response.user, task=task_response.task,
                                task_response=task_response, time=formatted_time,
                                supplementary=supplementary,
-                               permissions=current_user.permissions,
-                               supplementaryOrder=supplementary_order)
+                               permissions=current_user.permissions)
 
 
 class ManualGradingView(MethodView):
