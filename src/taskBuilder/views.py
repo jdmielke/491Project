@@ -7,9 +7,6 @@ from flask_login import current_user
 from flask_login import login_required
 from flask_login import current_user
 import traceback
-import tempfile
-import os
-from StringIO import StringIO
 from werkzeug import secure_filename
 import xlsxwriter
 
@@ -64,7 +61,6 @@ def store_task(taskID):
     task.course = models.Course.query.filter_by(id=courseID).first()
     task.duedate = datetime.datetime.fromtimestamp(taskDueDate/1000.0)
     task.supplementary = json.dumps(data.get('supplementary'))
-    task.xml_data = json.dumps(data['xmlData']);
     models.db.session.add(task)
     models.db.session.commit()
     print "Stored task " + str(task.id) + " into db."
@@ -169,7 +165,7 @@ class TaskView(MethodView):
         course = models.Course.query.filter_by(id=task.course_id).first()
         html_content = task.content.strip().replace('\n', '')
         secondary_teachers = [t.strip() for t in course.secondaryTeachers.split(",")] if course.secondaryTeachers else []
-        if current_user.id == course.teacher_id or str(current_user.id) in secondary_teachers or current_user.permissions >= 100:
+        if current_user.id == course.teacher_id or str(current_user.id) in secondary_teachers:
             return render_template("tasks/taskAuthorView.html", task=task, course=course)
         elif course.id not in [c.id for c in current_user.courses]:
             return "You are not allowed to see this task", 401
@@ -186,7 +182,6 @@ class TaskView(MethodView):
             task_response.task_id = int(taskID)
             task_response.student_id = current_user.id
             task_response.supplementary = json.dumps(data.get('supplementary'))
-            task_response.supplementary_order = json.dumps(data.get('supplementaryOrder'))
             start_time = data.get('startTaskTime')
             end_time = data.get('endTaskTime')
             date_format = "%m/%d/%Y %I:%M:%S %p"
@@ -194,7 +189,6 @@ class TaskView(MethodView):
             formatted_e_time = datetime.datetime.strptime(end_time.encode('ascii', 'ignore'), date_format)
             task_response.start_time = formatted_s_time
             task_response.end_time = formatted_e_time
-            task_response.xml_data = json.dumps(data.get('xmlData'))
             models.db.session.add(task_response)
             models.db.session.commit()
             id = models.TaskResponse.query.order_by(models.TaskResponse.id.desc()).first().id
@@ -219,8 +213,7 @@ class TaskExportView(MethodView):
             return "Permission Denied", 401
         date_format = "%m/%d/%Y %I:%M:%S %p"
 
-        output = StringIO()
-        workbook = xlsxwriter.Workbook(output)
+        workbook = xlsxwriter.Workbook('src/static/uploads/task_%s.xlsx' % taskID)
         worksheet = workbook.add_worksheet()
         worksheet.write(0, 0, "Student ID")
         worksheet.set_column('A:A', 11)
@@ -249,7 +242,7 @@ class TaskExportView(MethodView):
                 worksheet.write(0, 10 + (i * 2), "Automatic Question:%s - Correctness" % automatic_question['questionID'])
                 worksheet.set_column(10 + (i * 2), 10 + (i * 2), 35)
             for i, key in enumerate(supp.keys()):
-                worksheet.write(0, 11 + (i * 4), "Supplementary:%s - Title" % key)
+                worksheet.write(0, 11 + (i * 2), "Supplementary:%s - Title" % key)
                 worksheet.set_column(11 + (i * 4), 11 + (i * 4), 40)
                 worksheet.write(0, 12 + (i * 4), "Supplementary:%s - Min Time" % key)
                 worksheet.set_column(12 + (i * 4), 12 + (i * 4), 40)
@@ -299,16 +292,7 @@ class TaskExportView(MethodView):
                         worksheet.write(i + 1, 14 + (j * 4), False)
 
         workbook.close()
-        xlsx_data = output.getvalue()
-        f = tempfile.TemporaryFile()
-        f.write(xlsx_data)
-        f.seek(0, os.SEEK_END)
-        size = f.tell()
-        f.seek(0)
-        fn = 'task_%s.xlsx' % taskID
-        response = flask.send_file(f, as_attachment=True, attachment_filename=fn,
-                                   add_etags=False)
-        return response
+        return redirect('/uploads/task_%s.xlsx' % taskID)
 
 
 class MultipleChoiceView(MethodView):
@@ -356,7 +340,7 @@ class ProblemStatementView(MethodView):
 class CoursesTeachingView(MethodView):
 
     def get(self):
-        courses = current_user.get_courses_where_teacher_or_ta()
+        courses = current_user.get_courses_where_teacher_or_admin()
         courses = [c.serialize for c in courses]
         return flask.json.dumps(courses)
 

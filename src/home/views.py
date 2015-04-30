@@ -13,8 +13,6 @@ import json
 import datetime as DT
 import auth
 from auth import auth
-import os.path
-from settingslocal import ADMIN_PASSWORD
 
 
 class HomeScreenView(MethodView):
@@ -22,8 +20,10 @@ class HomeScreenView(MethodView):
 
     def get(self):
         teaching = current_user.get_courses_where_teacher_or_ta()
-        enrolled = current_user.get_courses_enrolled()
-
+        enrolled = []
+        for course in current_user.courses:
+            if not course.isArchived:
+                enrolled.append(course)
         return render_template('home.html',
                                courses_enrolled=enrolled,
                                courses_teaching=teaching)
@@ -32,7 +32,7 @@ class HomeScreenView(MethodView):
 class ClassListView(MethodView):
     def get(self):
         if current_user.is_authenticated():
-            courses = current_user.get_courses_enrolled()
+            courses = current_user.courses
             courses += current_user.get_courses_where_teacher_or_ta()
             courses = [c.serialize for c in courses]
             return flask.json.dumps(courses)
@@ -119,7 +119,7 @@ class AddAdminView(MethodView):
         if email:
             user = models.User.query.filter(models.User.email.contains(email)).first()
             if user and user.permissions:
-                if securityCode == ADMIN_PASSWORD and user.permissions < 100:
+                if securityCode == "123456" and user.permissions < 100:
                     user.permissions = 100
                     models.db.session.commit()
                     return email
@@ -145,7 +145,7 @@ class RemoveUserView(MethodView):
             user = models.User.query.filter(models.User.email.contains(email)).first()
             if user and user.permissions:
                 if user.permissions == 100:
-                    if securityCode == ADMIN_PASSWORD:
+                    if securityCode == "123456":
                         user.permissions = 10
                     else:
                         return HttpResponse("error", status=400)

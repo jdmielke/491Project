@@ -7,7 +7,7 @@
 {% endblock %}
 {% block body %}
 <div class="col-md-8 col-sm-12 col-sm-offset-2 author admin" style="display: none">
-    <div id="tasks-teaching-list" class="list-group">
+    <div id="tasks-teaching-list author" class="list-group">
         <li class="list-group-item active" align="center"><strong>Options</strong></li>
         <a class="list-group-item">
             <table width="100%">
@@ -15,7 +15,7 @@
                     <td width="35%"><b>Change Status to Author</b></td>
                     <td width="15%"><input id="authorEmail" type="text" class="form-control" placeholder="User's Email" /></td>
                     <td width="15%">&nbsp</td>
-                    <td width="15%"><button id="submitAddAuthor" type="button" class="btn btn-lg btn-warning pull-right">Change</button> </td>
+                    <td width="15%"><button id="submitAddAuthor" type="button" class="btn btn-lg btn-danger pull-right">Change</button> </td>
                     <td id="addAuthorNotification" width="20%" style="color:red; visibility: hidden">  *Incorrect</td>
                 </tr>
                 <tr class="admin" style="display: none"><td>&nbsp</td></tr>
@@ -23,7 +23,7 @@
                     <td width="35%"><b>Change Status to Admin</b></td>
                     <td width="15%"><input id="adminEmail" type="text" class="form-control" placeholder="User's Email" /></td>
                     <td width="15%">&nbsp</td>
-                    <td width="15%"><button id="submitAddAdmin" type="button" class="btn btn-lg btn-warning pull-right">Change</button> </td>
+                    <td width="15%"><button id="submitAddAdmin" type="button" class="btn btn-lg btn-danger pull-right">Change</button> </td>
                     <td id="addAdminNotification" width="20%" style="color:red; visibility: hidden">  *Incorrect</td>
                 </tr>
                 <tr class="admin" style="display: none"><td>&nbsp</td></tr>
@@ -62,7 +62,7 @@
                 success:  function(data) {
                     alert(data + " is now an Author");
                     $("#addAuthorNotification").css("visibility", "hidden");
-                    $("#authorEmail").val("");
+                    $("#addAuthorEmail").val("");
                 },
                 error: function(data){    
                     $("#addAuthorNotification").css("visibility","visible");
@@ -84,7 +84,7 @@
                 success:  function(data) {
                     alert(data + " is now an Admin");
                     $("#addAdminNotification").css("visibility", "hidden");
-                    $("#adminEmail").val("");
+                    $("#addAdminEmail").val("");
                 },
                 error: function(data){
                     $("#addAdminNotification").css("visibility","visible");
@@ -108,8 +108,7 @@
                 success:  function(data) {
                     alert(data + " is now a Student");
                     $("#addAUserNotification").css("visibility", "hidden");
-                    $("#removalAdminEmail").val("");
-                    $("#removalAuthorEmail").val("");
+                    $("#removalEmail").val("");
                 },
                 error: function(data){
                     if(removeAdmin){

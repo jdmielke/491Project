@@ -16,11 +16,6 @@
       Date of Response: <p class="text-muted">{{ time }}</p>
       Correctness Grade: <p id="correctnessGrade" class="text-muted">{{task_response.correctness_grade}}%</p>
       Cognitive Grade: <p class="text-muted">{{task_response.cognitive_grade}}%</p>
-      {% if permissions > 10%}
-      <form action='/response/{{task_response.id}}/export' class='form-inline'>
-          <button id="export" type="submit" class="btn btn-default">Export Response Data</button>
-      </form>
-      {% endif %}
   </div>
   {% if permissions > 10 %}
   <div class="col-md-5 vertical-line">
@@ -84,15 +79,6 @@
           </div>
         </div>
       {% endfor %}<br>
-
-      {% if supplementaryOrder %}  
-      <div id="supplementaryOrder">
-      <h4>Order of Supplementary Information Clicked</h4>
-      {% for suppOrder in supplementaryOrder%}
-        {{suppOrder}}<br>
-      {% endfor %}
-      </div>
-      {% endif %}
   </div>
   {% endif %}
 </div>

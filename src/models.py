@@ -59,13 +59,6 @@ class User(db.Model):
                 courses_where_ta.append(c)
         return courses_where_ta
 
-    def get_courses_enrolled(self):
-        courses = []
-        for course in self.courses:
-            if not course.isArchived:
-                courses.append(course)
-        return courses
-
     def get_courses_where_teacher_or_ta(self):
         courses = []
         if self.permissions >= 100:
@@ -146,7 +139,6 @@ class Task(db.Model):
     task_responses = db.relationship('TaskResponse', backref='task', lazy='dynamic')
     supplementary = db.Column(db.Text)
     status = db.Column(db.String(20))
-    xml_data = db.Column(db.Text())
 
     def __init__(self, title):
         self.title = title
@@ -175,12 +167,10 @@ class TaskResponse(db.Model):
     correctness_grade = db.Column(db.Float)
     cognitive_grade = db.Column(db.Float)
     supplementary = db.Column(db.Text)
-    supplementary_order = db.Column(db.Text)
     graded_supplementary = db.Column(db.Text)
     graded = db.Column(db.Boolean)
     start_time = db.Column(db.DateTime())
     end_time = db.Column(db.DateTime())
-    xml_data = db.Column(db.Text())
 
     def __init__(self, response):
         self.response = response

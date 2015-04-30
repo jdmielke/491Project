@@ -41,12 +41,10 @@
       var data = {};
       data['automatic_questions'] = automaticQuestions;
       data['supplementary'] = supplementaryInformationTimes;
-      data['supplementaryOrder'] = supplementaryInformationOrder;
       data['manual_questions'] = manualQuestions;
       data['startTaskTime'] = getFormattedDatetime(startTaskTime);
       data['endTaskTime'] = getFormattedDatetime(endTaskTime);
       data['totalTaskTime'] = totalTaskTime/1000;
-      data['xmlData'] = informationForXML;
       $.ajax({
         url: window.location.pathname,
         type: 'POST',
