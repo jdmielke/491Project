@@ -64,7 +64,7 @@ class TestGradebookScreenView(unittest.TestCase):
         course2.isArchived = True
         courses = [course2,course]
         self.current_user.courses = courses
-        response = Mock()
+        response = []
         self.models.TaskResponse.query.filter.return_value.order_by.\
             return_value.first.return_value = response
         t = {
